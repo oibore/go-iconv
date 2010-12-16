@@ -16,10 +16,21 @@ func main() {
 	str := "これは漢字です。"
 	//fmt.Printf("%s\n", str);
 
-	cd := iconv.Open(tocode, fromcode)
+	cd, err := iconv.Open(tocode, fromcode)
+	if err != nil {
+		fmt.Printf("Error on opening: %s\n", err)
+		return
+	}
 
-	str = cd.Conv(str)
+	str, err = cd.Conv(str)
+	if err != nil {
+		fmt.Printf("Error on conversion: %s\n", err)
+		return
+	}
 	fmt.Printf("str='%s'\n", str)
 
-	cd.Close()
+	err = cd.Close()
+	if err != nil {
+		fmt.Printf("Error on close: %s\n", err)
+	}
 }
