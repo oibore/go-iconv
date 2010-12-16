@@ -3,20 +3,20 @@
 //
 package iconv
 
+// #include <iconv.h>
 // #include "iconv_wrapper.h"
 import "C"
 
 import (
-	"unsafe"
 	"os"
 )
 
 type Iconv struct {
-	pointer unsafe.Pointer
+	pointer C.iconv_t
 }
 
 func Open(tocode string, fromcode string) (*Iconv, os.Error) {
-	ret, err := C.IconvOpen(C.CString(tocode), C.CString(fromcode))
+	ret, err := C.iconv_open(C.CString(tocode), C.CString(fromcode))
 	if err != nil {
 		return nil, err
 	}
@@ -24,7 +24,7 @@ func Open(tocode string, fromcode string) (*Iconv, os.Error) {
 }
 
 func (cd *Iconv) Close() os.Error {
-	_, err := C.IconvClose(cd.pointer)
+	_, err := C.iconv_close(cd.pointer)
 	return err
 }
 

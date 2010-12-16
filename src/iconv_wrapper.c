@@ -8,17 +8,7 @@
 
 #include "iconv_wrapper.h"
 
-void *IconvOpen(const char *tocode, const char *fromcode)
-{
-    return iconv_open(tocode, fromcode);
-}
-
-int IconvClose(void *cd)
-{
-    return iconv_close(cd);
-}
-
-int IconvIconv(void *cd, char *inbuf, char **outbuf)
+int IconvIconv(iconv_t cd, char *inbuf, char **outbuf)
 {
     size_t inbytes  = strlen(inbuf);
     size_t outbytes = inbytes * 8;
