@@ -4,11 +4,11 @@
 package iconv
 
 // #include <iconv.h>
-// #include "iconv_wrapper.h"
 import "C"
 
 import (
 	"os"
+	"unsafe"
 )
 
 type Iconv struct {
@@ -28,12 +28,19 @@ func (cd *Iconv) Close() os.Error {
 	return err
 }
 
-func (cd *Iconv) Conv(inbuf string) (string, os.Error) {
-	outbuf := C.CString(*new(string))
-	_, err := C.IconvIconv(cd.pointer, C.CString(inbuf), &outbuf)
+func (cd *Iconv) Conv(input string) (string, os.Error) {
+	inbuf := []byte(input)
+	outbuf := make([]byte, len(inbuf)*8)
+	inbytes := C.size_t(len(inbuf))
+	outbytes := C.size_t(len(outbuf))
+	inptr := &inbuf[0]
+	outptr := &outbuf[0]
+
+	_, err := C.iconv(cd.pointer, (**C.char)(unsafe.Pointer(&inptr)), &inbytes,
+	                              (**C.char)(unsafe.Pointer(&outptr)), &outbytes)
 	if err != nil {
 		return "", err
 	}
 
-	return C.GoString(outbuf), nil
+	return string(outbuf[:len(outbuf)-int(outbytes)]), nil
 }
