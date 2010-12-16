@@ -4,23 +4,22 @@
 package main
 
 import (
-    "fmt";
-    //"strings";
-    "iconv";
+	"fmt"
+	//"strings";
+	"iconv"
 )
 
 func main() {
-    tocode   := "SJIS";
-    fromcode := "UTF-8";
+	tocode := "SJIS"
+	fromcode := "UTF-8"
 
-    str := "これは漢字です。";
-    //fmt.Printf("%s\n", str);
+	str := "これは漢字です。"
+	//fmt.Printf("%s\n", str);
 
-    cd := iconv.Open(tocode, fromcode);
+	cd := iconv.Open(tocode, fromcode)
 
-    str = cd.Conv(str);
-    fmt.Printf("str='%s'\n", str );
+	str = cd.Conv(str)
+	fmt.Printf("str='%s'\n", str)
 
-    cd.Close()
+	cd.Close()
 }
-
