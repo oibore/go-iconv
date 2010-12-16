@@ -13,6 +13,7 @@ import (
 )
 
 var EILSEQ = os.Errno(int(C.EILSEQ))
+var E2BIG = os.Errno(int(C.E2BIG))
 
 type Iconv struct {
 	pointer C.iconv_t
@@ -31,23 +32,28 @@ func (cd *Iconv) Close() os.Error {
 	return err
 }
 
-func (cd *Iconv) Conv(input string) (string, os.Error) {
+func (cd *Iconv) Conv(input string) (result string, err os.Error) {
 	if len(input) == 0 {
 		return "", nil
 	}
 
 	inbuf := []byte(input)
-	outbuf := make([]byte, len(inbuf)*8)
+	outbuf := make([]byte, len(inbuf))
 	inbytes := C.size_t(len(inbuf))
-	outbytes := C.size_t(len(outbuf))
 	inptr := &inbuf[0]
-	outptr := &outbuf[0]
 
-	_, err := C.iconv(cd.pointer, (**C.char)(unsafe.Pointer(&inptr)), &inbytes,
-	                              (**C.char)(unsafe.Pointer(&outptr)), &outbytes)
-	if err != nil {
-		return "", err
+	result = ""
+	for inbytes > 0 {
+		outbytes := C.size_t(len(outbuf))
+		outptr := &outbuf[0]
+		_, err = C.iconv(cd.pointer,
+			(**C.char)(unsafe.Pointer(&inptr)), &inbytes,
+			(**C.char)(unsafe.Pointer(&outptr)), &outbytes)
+		result += string(outbuf[:len(outbuf)-int(outbytes)])
+		if err != nil && err != E2BIG {
+			return result, err
+		}
 	}
 
-	return string(outbuf[:len(outbuf)-int(outbytes)]), nil
+	return result, nil
 }
