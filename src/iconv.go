@@ -10,18 +10,21 @@ import (
     "unsafe";
 )
 
-func Open(tocode string, fromcode string) unsafe.Pointer {
-    return C.IconvOpen(C.CString(tocode), C.CString(fromcode));
+type Iconv struct {
+    pointer unsafe.Pointer
 }
 
-func Close(cd unsafe.Pointer) int {
-    return int(C.IconvClose(cd));
+func Open(tocode string, fromcode string) *Iconv {
+    return &Iconv{C.IconvOpen(C.CString(tocode), C.CString(fromcode))};
 }
 
-func Iconv(cd unsafe.Pointer, inbuf  string) string {
+func (cd *Iconv) Close() int {
+    return int(C.IconvClose(cd.pointer));
+}
 
+func (cd *Iconv) Conv(inbuf string) string {
     outbuf := C.CString(*new(string));
-    C.IconvIconv(cd, C.CString(inbuf), &outbuf);
+    C.IconvIconv(cd.pointer, C.CString(inbuf), &outbuf);
 
     return C.GoString(outbuf);
 }

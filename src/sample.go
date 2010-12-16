@@ -18,9 +18,9 @@ func main() {
 
     cd := iconv.Open(tocode, fromcode);
 
-    str = iconv.Iconv(cd, str );
+    str = cd.Conv(str);
     fmt.Printf("str='%s'\n", str );
 
-    iconv.Close(cd);
+    cd.Close()
 }
 
