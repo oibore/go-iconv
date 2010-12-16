@@ -2,12 +2,12 @@
 #
 #
 
-include $(GOROOT)/src/Make.$(GOARCH)
+include $(GOROOT)/src/Make.inc
 
 TARG=iconv
 
 CGOFILES=iconv.go
-CGO_LDFLAGS=iconv_wrapper.o
+CGO_LDFLAGS=iconv_wrapper.o -liconv
 CLEANERFILES+=sample
 
 include $(GOROOT)/src/Make.pkg
