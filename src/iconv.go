@@ -4,12 +4,15 @@
 package iconv
 
 // #include <iconv.h>
+// #include <errno.h>
 import "C"
 
 import (
 	"os"
 	"unsafe"
 )
+
+var EILSEQ = os.Errno(int(C.EILSEQ))
 
 type Iconv struct {
 	pointer C.iconv_t
