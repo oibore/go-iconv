@@ -32,6 +32,10 @@ func (cd *Iconv) Close() os.Error {
 }
 
 func (cd *Iconv) Conv(input string) (string, os.Error) {
+	if len(input) == 0 {
+		return "", nil
+	}
+
 	inbuf := []byte(input)
 	outbuf := make([]byte, len(inbuf)*8)
 	inbytes := C.size_t(len(inbuf))
