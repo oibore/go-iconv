@@ -10,6 +10,7 @@ import "C"
 import (
 	"os"
 	"unsafe"
+	"bytes"
 )
 
 var EILSEQ = os.Errno(int(C.EILSEQ))
@@ -33,6 +34,8 @@ func (cd *Iconv) Close() os.Error {
 }
 
 func (cd *Iconv) Conv(input string) (result string, err os.Error) {
+	var buf bytes.Buffer
+
 	if len(input) == 0 {
 		return "", nil
 	}
@@ -42,18 +45,17 @@ func (cd *Iconv) Conv(input string) (result string, err os.Error) {
 	inbytes := C.size_t(len(inbuf))
 	inptr := &inbuf[0]
 
-	result = ""
 	for inbytes > 0 {
 		outbytes := C.size_t(len(outbuf))
 		outptr := &outbuf[0]
 		_, err = C.iconv(cd.pointer,
 			(**C.char)(unsafe.Pointer(&inptr)), &inbytes,
 			(**C.char)(unsafe.Pointer(&outptr)), &outbytes)
-		result += string(outbuf[:len(outbuf)-int(outbytes)])
+		buf.Write(outbuf[:len(outbuf)-int(outbytes)])
 		if err != nil && err != E2BIG {
-			return result, err
+			return buf.String(), err
 		}
 	}
 
-	return result, nil
+	return buf.String(), nil
 }
