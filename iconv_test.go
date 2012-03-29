@@ -78,3 +78,21 @@ func TestError(t *testing.T) {
 		t.Errorf("Unexpected error: %#s (expected %#s)", err, syscall.EILSEQ)
 	}
 }
+
+func TestTranslit(t *testing.T) {
+	result, err := Conv("1€ is nothing nowadays", "ASCII//TRANSLIT", "UTF-8")
+	if err != nil {
+		t.Errorf("Error on conversion: %s", err)
+		return
+	}
+	if result != "1EUR is nothing nowadays" {
+		t.Errorf("Unexpected transliteration: %s", result)
+		return
+	}
+
+	result, err = Conv("1€ is nothing nowadays", "ASCII", "UTF-8")
+	if err != syscall.EILSEQ {
+		t.Errorf("Unexpected error: %s", err)
+		return
+	}
+}

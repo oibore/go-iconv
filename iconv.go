@@ -1,3 +1,5 @@
+// Bindings for iconv. Iconv is a set of functions used to convert strings
+// between different character sets
 package iconv
 
 // #include <iconv.h>
@@ -12,10 +14,18 @@ import (
 
 const bufSize = 512
 
+// Opaque structure containing the internal state of the codec
 type Iconv struct {
 	pointer C.iconv_t
 }
 
+// Create a codec which convert a string encoded in fromcode into a string
+// encoded in tocode
+// 
+// If you add //TRANSLIT at the end of tocode, any character which doesn't 
+// exists in the destination charset will be replaced by its closest
+// equivalent (for example, € will be represented by EUR in ASCII). Else,
+// such a character will trigger an error.
 func Open(tocode string, fromcode string) (*Iconv, error) {
 	ret, err := C.iconv_open(C.CString(tocode), C.CString(fromcode))
 	if err != nil {
@@ -24,11 +34,13 @@ func Open(tocode string, fromcode string) (*Iconv, error) {
 	return &Iconv{ret}, nil
 }
 
+// Destroy the internal state of the codec, releasing associated memory
 func (cd *Iconv) Close() error {
 	_, err := C.iconv_close(cd.pointer)
 	return err
 }
 
+// Use the codec to convert a string
 func (cd *Iconv) Conv(input string) (result string, err error) {
 	var buf bytes.Buffer
 
@@ -54,4 +66,14 @@ func (cd *Iconv) Conv(input string) (result string, err error) {
 	}
 
 	return buf.String(), nil
+}
+
+// Utility function which create a codec, convert the string and then destroy it
+func Conv(input string, tocode string, fromcode string) (string, error) {
+	h, err := Open(tocode, fromcode)
+	if err != nil {
+		return "", err
+	}
+	defer h.Close()
+	return h.Conv(input)
 }
