@@ -3,7 +3,6 @@
 //
 package iconv
 
-// #cgo LDFLAGS: -liconv
 // #include <iconv.h>
 // #include <errno.h>
 import "C"
