@@ -13,6 +13,8 @@ import (
 	"unsafe"
 )
 
+const bufSize = 512
+
 type Iconv struct {
 	pointer C.iconv_t
 }
@@ -38,7 +40,7 @@ func (cd *Iconv) Conv(input string) (result string, err error) {
 	}
 
 	inbuf := []byte(input)
-	outbuf := make([]byte, len(inbuf))
+	outbuf := make([]byte, bufSize)
 	inbytes := C.size_t(len(inbuf))
 	inptr := &inbuf[0]
 
