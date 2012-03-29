@@ -1,6 +1,3 @@
-//
-// iconv.go
-//
 package iconv
 
 // #include <iconv.h>
