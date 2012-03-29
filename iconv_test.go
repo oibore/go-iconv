@@ -5,7 +5,7 @@ package iconv
 
 import (
 	"testing"
-	"os"
+	"syscall"
 )
 
 var testData = []struct{utf8, other, otherEncoding string} {
@@ -68,13 +68,13 @@ func TestIconvReverse(t *testing.T) {
 
 func TestError(t *testing.T) {
 	_, err := Open("INVALID_ENCODING", "INVALID_ENCODING")
-	if err != os.EINVAL {
-		t.Errorf("Unexpected error: %#s (expected %#s)", err, os.EINVAL)
+	if err != syscall.EINVAL {
+		t.Errorf("Unexpected error: %#s (expected %#s)", err, syscall.EINVAL)
 	}
 
 	cd, _ := Open("ISO-8859-15", "UTF-8")
 	_, err = cd.Conv("\xc3a")
-	if err != EILSEQ {
-		t.Errorf("Unexpected error: %#s (expected %#s)", err, EILSEQ)
+	if err != syscall.EILSEQ {
+		t.Errorf("Unexpected error: %#s (expected %#s)", err, syscall.EILSEQ)
 	}
 }
