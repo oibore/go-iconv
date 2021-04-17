@@ -1,3 +1,7 @@
+# DEPRECATION NOTICE
+
+This package is no longer maintained.
+
 # PACKAGE
 
     import "github.com/sloonz/go-iconv"
